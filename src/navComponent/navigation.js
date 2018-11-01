@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import TextField from '@material-ui/core/TextField';
 
 class navigation extends Component {
 
@@ -51,8 +52,7 @@ class navigation extends Component {
     render() {
         //console.log(this.props)
         return(
-            <div>
-
+            <div className="navigtion_origin">
                 <select onChange={this._targetSelectedChange} >
                     {this.props.target_Type.map((value, index) => {
                         return <option value={value} key={index} >{value}</option>

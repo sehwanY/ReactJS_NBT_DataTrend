@@ -3,6 +3,8 @@ import './App.css';
 import Navigation from './navComponent/navigation'
 import ContentNB from './bodyComponent/contentNB'
 import ContentT from './bodyComponent/contentT'
+import TopicTrendRank from './bodyComponent/topicTrendRank'
+import TrendGraph from './bodyComponent/trendGraph'
 
 class App extends Component {
 
@@ -28,38 +30,16 @@ class App extends Component {
     keyword : 'single',
     period : null,
     criteria : "title",
-    search_value : ""
+    search_value : "삼성",
+    search_count : "30"
   }
 
   componentWillMount(){
     this._startSearch()
   }
-  
-  // 검색 시작 (검색함수 호출 및 저장)
-  _startSearch = async() => {
-    const search_Data = await this._getSearchData()
-    console.log(search_Data)
-    this.setState({
-      search_Data
-    })
-  }
 
-  // 문서 검색 함수 ADAMs.api
-  _getSearchData = () => {
-
-    return fetch("http://api.adams.ai/datamixiApi/search?key=" + this.state.apiKey 
-                    + "&target=" + this.state.target 
-                    + "&keyword=" + this.state.search_value
-                    + "&count=5")
-    .then((response) => response.json())
-    .then((json) => json.return_object[0].documents)
-    .catch((error) => {
-      console.log("getSocial Err :" + error);
-    })
-  }
-
-  // 조건 변경 => state 감지 => 검색
-  _setChangeOption = (targetType, keywordType, search_data) => {
+   // 조건 변경 => state 감지 => 검색
+   _setChangeOption = (targetType, keywordType, search_data) => {
 
     this.setState({
       target : targetType,
@@ -70,6 +50,73 @@ class App extends Component {
     this._startSearch()
   }
 
+  // 검색 시작 (검색함수 호출 및 저장)
+  _startSearch = async() => {
+    // 기본 문서
+    const search_Data = await this._getSearchData()
+
+    switch(this.state.target){
+      case 'news' :
+        // 첫 번째 줄만 줄바꿈 후, 다음 문장을 띄어쓰기 해준다.
+        for(let start = 0; start < search_Data.length; start++){
+          search_Data[start].fields.content[0] = search_Data[start].fields.content[0].replace('\n', '<br />&nbsp&nbsp')
+          // /(\n|\r\n)/g
+        }
+        break;
+      case 'blog' :
+        // 모든 문장을 줄바꿈처리한다.
+        for(let start = 0; start < search_Data.length; start++){
+          search_Data[start].fields.content[0] = search_Data[start].fields.content[0].replace(/(\n|\r\n)/g, '<br />&nbsp&nbsp')
+          // /(\n|\r\n)/g 
+        }
+      case 'twitter' :
+        break;
+      default : 
+        console.log("replaceDOM Error_startSerch funtion")
+        break;
+
+    }
+    
+    // 문서 저장
+    this.setState({
+      search_Data
+    })
+
+    // 연관검색어 (키워드 유무 확인)
+    if(this.state.search_value !== ""){
+      const topicTrendData = await this._getTopicTrendData()
+      // 연관검색어 저장
+      this.setState({
+        topicTrendData
+      })
+    }
+
+  }
+
+  // 문서 검색 함수 ADAMs.api
+  _getSearchData = () => {
+    return fetch("http://api.adams.ai/datamixiApi/search?key=" + this.state.apiKey 
+                    + "&target=" + this.state.target 
+                    + "&keyword=" + this.state.search_value
+                    + "&count=" + this.state.search_count)
+    .then((response) => response.json())
+    .then((json) => json.return_object[0].documents)
+    .catch((error) => {
+      console.log("getSocial Err :" + error);
+    })
+  }
+
+  // 연관 검색어
+  _getTopicTrendData = () => {
+    return fetch("http://api.adams.ai/datamixiApi/topictrend?key=" + this.state.apiKey 
+                    + "&target=" + this.state.target 
+                    + "&keyword=" + this.state.search_value)
+    .then((response) => response.json())
+    .then((json) => json.return_object.trends[json.return_object.trends.length - 1].nodes)
+    .catch((error) => {
+      console.log("getTopicTrend Err :" + error);
+    })
+  }
 
   // body 랜더링
 
@@ -78,14 +125,18 @@ class App extends Component {
 
   // twitter 
   // author / tweet_id / published_date / message
+
+  // { this._renderBody_topicTrend() }
   _renderBody = () => {
     return (
     <div className="App_body">
       <div className="body_trend">
-
+        { this.state.topicTrendData ? this._renderBody_topicTrend() : "not data"}
       </div>
       <div className="body_context">
         { this._rederBodyController(this.state.target)}
+        <TrendGraph />
+        <div id="chart"></div>
       </div>
     </div>
     )
@@ -129,6 +180,18 @@ class App extends Component {
       />
     })
   }
+
+  // 연관검색어
+  _renderBody_topicTrend = () => {
+    return this.state.topicTrendData.map((data) => {
+      return <TopicTrendRank 
+        rankTitle = {data.name}
+        rank = {data.id}
+        key = {data.id}
+      />
+    })
+  }
+
 
   render() {
     return (

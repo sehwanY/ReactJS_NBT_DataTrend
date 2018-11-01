@@ -21,11 +21,11 @@ class contentT extends Component {
             <div>
                 <div onClick={this.onOpenModal}> {this.props.published_date} {this.props.message} </div>
                 <Modal open={open} onClose={this.onCloseModal} center>
-                    <h2> {this.props.author} {this.props.tweet_id} </h2>
-                        {this.props.published_date}
-                    <p>
-                        {this.props.message}
-                    </p>
+                    <h2> {this.props.author} ( {this.props.tweet_id} ) </h2>
+                    <div dangerouslySetInnerHTML={ {__html: this.props.published_date} }> 
+                    </div>
+                    <div dangerouslySetInnerHTML={ {__html: this.props.message} }> 
+                    </div>
                 </Modal>
             </div>
         )
