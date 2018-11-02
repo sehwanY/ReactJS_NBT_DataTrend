@@ -52,20 +52,21 @@ class App extends Component {
 
   // 검색 시작 (검색함수 호출 및 저장)
   _startSearch = async() => {
+    /* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
     // 기본 문서
     const search_Data = await this._getSearchData()
 
     switch(this.state.target){
       case 'news' :
         // 첫 번째 줄만 줄바꿈 후, 다음 문장을 띄어쓰기 해준다.
-        for(let start = 0; start < search_Data.length; start++){
+        for(let start in search_Data){
           search_Data[start].fields.content[0] = search_Data[start].fields.content[0].replace('\n', '<br />&nbsp&nbsp')
           // /(\n|\r\n)/g
         }
         break;
       case 'blog' :
         // 모든 문장을 줄바꿈처리한다.
-        for(let start = 0; start < search_Data.length; start++){
+        for(let start in search_Data){
           search_Data[start].fields.content[0] = search_Data[start].fields.content[0].replace(/(\n|\r\n)/g, '<br />&nbsp&nbsp')
           // /(\n|\r\n)/g 
         }
@@ -75,13 +76,20 @@ class App extends Component {
       default : 
         console.log("replaceDOM Error_startSerch funtion")
         break;
-
     }
     
+    // 문서의 날짜값 정리
+    for(let data in search_Data){
+      let argDate = search_Data[data].fields.published_date[0].split("T")  
+      search_Data[data].fields.published_date[0] = argDate[0] 
+    }
+
     // 문서 저장
     this.setState({
       search_Data
     })
+
+    /* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
 
     // 연관검색어 (키워드 유무 확인)
     if(this.state.search_value !== ""){
@@ -90,8 +98,31 @@ class App extends Component {
       this.setState({
         topicTrendData
       })
-    }
 
+    /* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+      // 기간별 검색 횟수
+      const topicCountData = await this._getTrendSearchCount()
+
+      let testt = new Array();
+      // 문서의 날짜값 정리
+      for(let data in topicCountData){
+        let argDate = topicCountData[data].date.split("T")  
+        topicCountData[data].date = argDate[0] 
+
+        //
+        let argDate2 = topicCountData[data].date.split('-')
+        let argDate3 = argDate2[1] + argDate2[2]
+        testt.push({ "x" : argDate3 , "y" : topicCountData[data].orgCount })
+      }
+      console.log(testt)
+      // 저장
+      this.setState({
+        topicCountData,
+        testt
+      })
+      console.log(topicCountData)
+    }
+    /* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
   }
 
   // 문서 검색 함수 ADAMs.api
@@ -107,7 +138,7 @@ class App extends Component {
     })
   }
 
-  // 연관 검색어
+  // 연관 검색어  ADAMs.api
   _getTopicTrendData = () => {
     return fetch("http://api.adams.ai/datamixiApi/topictrend?key=" + this.state.apiKey 
                     + "&target=" + this.state.target 
@@ -116,6 +147,19 @@ class App extends Component {
     .then((json) => json.return_object.trends[json.return_object.trends.length - 1].nodes)
     .catch((error) => {
       console.log("getTopicTrend Err :" + error);
+    })
+  }
+
+  // 검색 빈도(횟수) ADAMs.api
+  _getTrendSearchCount = () => {
+    return fetch("http://api.adams.ai/datamixiApi/trend?key=" + this.state.apiKey 
+                    + "&target=" + this.state.target
+                    + "&keyword=" + this.state.search_value
+                    + "&timeunit=day" )
+    .then((response) => response.json())
+    .then((json) => json.return_object.trend[0].data)
+    .catch((error) => {
+      console.log("getTrendSearch Err :" + error)
     })
   }
 
@@ -131,14 +175,21 @@ class App extends Component {
   _renderBody = () => {
     return (
     <div className="App_body">
-      <div className="body_trend">
-        { this.state.topicTrendData ? this._renderBody_topicTrend() : "not data"}
+      <div className="body">
+        <div className="body_trend">
+          { this.state.topicTrendData ? this._renderBody_topicTrend() : "not data"}
+        </div>
+        <div className="body_context">
+          { this._rederBodyController(this.state.target)}  
+        </div>
       </div>
-      <div className="body_context">
-        { this._rederBodyController(this.state.target)}
-        <TrendGraph />
-        <div id="chart"></div>
-      </div>
+        <div id="chart">
+          <TrendGraph 
+            values = {this.state.topicCountData}
+            testt = {this.state.testt}
+          />
+          <div id="graphTest"></div>
+        </div>
     </div>
     )
   }
