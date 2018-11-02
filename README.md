@@ -1,6 +1,7 @@
 BigData Api & ReactJS project
 -------------
 ☞☞☞ [viewing in GithubPage](https://sehwanY.github.io/ReactJS_NBT_DataTrend)
+<img src="./gitpageImage.png"/>
 
 ### news,blog,twitter = NBT_DataTrend
 - [ADAMs API](http://adams.ai) 
