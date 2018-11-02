@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/ReactJS_NBT_DataTrend/precache-manifest.a8795a2eb4a12c0fd06a70f4ceb5dc79.js"
+  "/ReactJS_NBT_DataTrend/precache-manifest.12647d11389122c8138ad59e1cda7e1c.js"
 );
 
 workbox.clientsClaim();
