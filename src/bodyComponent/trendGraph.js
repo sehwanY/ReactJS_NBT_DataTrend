@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { render } from 'react-dom'
-import { ResponsiveLine } from '@nivo/line'
+// import { render } from 'react-dom'
+// import { ResponsiveLine } from '@nivo/line'
 
 
 class trendGraph extends Component {

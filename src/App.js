@@ -69,6 +69,7 @@ class App extends Component {
           search_Data[start].fields.content[0] = search_Data[start].fields.content[0].replace(/(\n|\r\n)/g, '<br />&nbsp&nbsp')
           // /(\n|\r\n)/g 
         }
+        break;
       case 'twitter' :
         break;
       default : 

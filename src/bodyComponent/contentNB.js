@@ -24,8 +24,8 @@ class contentNB extends Component {
                     <p>
                         {this.props.published_date}
                     </p>
-                    <div classNames="contentImg">
-                        <img src={this.props.images} />
+                    <div>
+                        <img src={this.props.images} alt={this.props.images}/>
                     </div>
                     <div dangerouslySetInnerHTML={ {__html: this.props.contentData} }> 
                     </div>
