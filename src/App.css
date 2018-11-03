@@ -3,25 +3,58 @@
     height: 100%;
 }
 
-.App_nav {
-    min-width: 100%;
-    height: 50px;
-    background-color: black;
-    text-align: center
+.App_body {
+    width: 100%;
+    height: 100%;
+}
+
+.App_body_loading{
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.navigation {
+
+    width: 100%;
+    min-height: 5%;
+
+    display: inline-block;
+    text-align: center;
+}
+
+.body {
+
+    width: 100%;
+    height: 60%;
+
+    display: inline-table;
 }
 
 .body_trend {
-    max-width:30%;
+    width: auto;
+    height: 100%;
+    overflow-y: scroll;
+
     float: left;
-    padding: 10px;
+
+    margin: 0 20px 0 20px;
+    padding : 10px 20px 10px 20px;
 }
 
 .body_context {
-    max-width: 70%;
+    background-color: rgb(126, 121, 121);
+
+    width: auto;
+    height: 100%;
+    overflow-y: scroll;
+
     float: left;
-}
 
-.RankingDiv {
-    margin: 10px
-
+    margin: 0 20px 0 20px;
+    padding : 10px 20px 10px 20px;
 }

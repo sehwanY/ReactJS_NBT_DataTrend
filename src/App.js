@@ -5,6 +5,7 @@ import ContentNB from './bodyComponent/contentNB'
 import ContentT from './bodyComponent/contentT'
 import TopicTrendRank from './bodyComponent/topicTrendRank'
 import TrendGraph from './bodyComponent/trendGraph'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 class App extends Component {
 
@@ -30,31 +31,118 @@ class App extends Component {
     keyword : 'single',
     period : null,
     criteria : "title",
+
     search_value : "삼성",
-    search_count : "30"
+    search_value_second : "",
+
+    search_count : "30",
+
+    loading : false
   }
 
   componentWillMount(){
     this._startSearch()
   }
 
+  // state 의 loading 값을 변경
+  _setLoadingValue = (bool) => {
+    this.setState({
+      loading : bool
+    })
+  }
+
    // 조건 변경 => state 감지 => 검색
-   _setChangeOption = (targetType, keywordType, search_data) => {
+   _setChangeOption = (targetType, keywordType, search_data, search_value_data) => {
 
     this.setState({
       target : targetType,
       keyword : keywordType,
-      search_value : search_data
+      search_value : search_data,
+      search_value_second : search_value_data
     })
 
     this._startSearch()
   }
 
+  // 2중 키워드 문서 정리
+  _multipleDOMSearch = (datas) =>{
+
+    let rewriteDatas = new Array()
+    //console.log(argData)
+  
+    // 해당하는 것으로 교체
+    for(let addr in datas){
+      // console.log(datas[addr].fields.content[0].includes(this.state.search_value_second))
+      if(datas[addr].fields.content[0].includes(this.state.search_value_second) || 
+      datas[addr].fields.title[0].includes(this.state.search_value_second)){
+        rewriteDatas.push(datas[addr])
+      }
+    }
+
+    let argContent = null
+    // 형광팬 처리
+    for(let addr in rewriteDatas){
+
+      let ContentData = new Array()
+      // 나중에 따로 함수화
+      // 내용 (첫번째 키워드)
+      if(rewriteDatas[addr].fields.content[0].indexOf(this.state.search_value)){
+        // 키워드를 기준으로 분리
+        ContentData = rewriteDatas[addr].fields.content[0].split(this.state.search_value)
+        // 재조합
+        for(let contentAddr=0; contentAddr < ContentData.length; contentAddr++){
+          if(contentAddr >= ContentData.length -1){
+            // 마지막엔 그냥 붙이기
+            argContent += ContentData[contentAddr]
+          }else{
+            argContent += ContentData[contentAddr] + "<span style='background-color:yellow'>" + this.state.search_value + "</span>"
+          }
+        }
+        rewriteDatas[addr].fields.content[0] = argContent
+        console.log(argContent)
+      }
+
+      // 두번째 키워드
+      if(rewriteDatas[addr].fields.content[0].indexOf(this.state.search_value_second)){
+        // 키워드를 기준으로 분리
+        ContentData = rewriteDatas[addr].fields.content[0].split(this.state.search_value_second)
+        // 재조합
+        for(let contentAddr=0; contentAddr < ContentData.length; contentAddr++){
+          if(contentAddr >= ContentData.length -1){
+            // 마지막엔 그냥 붙이기
+            argContent += ContentData[contentAddr]
+          }else{
+            argContent += ContentData[contentAddr] + "<span style='background-color:#00FEFE'>" + this.state.search_value_second + "</span>"
+          }
+        }
+        rewriteDatas[addr].fields.content[0] = argContent
+        console.log(argContent)
+      }
+    }
+
+    //console.log(rewriteDatas)
+    return rewriteDatas;
+  }
+
   // 검색 시작 (검색함수 호출 및 저장)
   _startSearch = async() => {
+    this._setLoadingValue(true)
     /* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
     // 기본 문서
-    const search_Data = await this._getSearchData()
+    let search_Data = await this._getSearchData()
+
+
+    // keyword(Type) = mutiple
+    if(this.state.keyword === "multiple"){
+      let argData = new Array()
+      // console.log(await this._multipleDOMSearch(search_Data))
+      argData.push(await this._multipleDOMSearch(search_Data))
+      // Reset search_Data
+      search_Data = []
+      search_Data = argData.pop()
+
+      console.log(search_Data)
+    }
 
     switch(this.state.target){
       case 'news' :
@@ -103,7 +191,9 @@ class App extends Component {
       // 기간별 검색 횟수
       const topicCountData = await this._getTrendSearchCount()
 
-      let testt = new Array();
+      let TrendGraphDate = new Array([]);
+      let TrendGraphCount = new Array([]);
+
       // 문서의 날짜값 정리
       for(let data in topicCountData){
         let argDate = topicCountData[data].date.split("T")  
@@ -111,18 +201,23 @@ class App extends Component {
 
         //
         let argDate2 = topicCountData[data].date.split('-')
-        let argDate3 = argDate2[1] + argDate2[2]
-        testt.push({ "x" : argDate3 , "y" : topicCountData[data].orgCount })
+        let argDate3 = argDate2[1] + "/" + argDate2[2]
+        TrendGraphDate.push( argDate3 )
+        TrendGraphCount.push( topicCountData[data].orgCount )
+        
       }
-      console.log(testt)
+
+      //console.log(TrendGraphDate)
+      //console.log(TrendGraphCount)
+
       // 저장
       this.setState({
-        topicCountData,
-        testt
+        TrendGraphDate,
+        TrendGraphCount
       })
-      console.log(topicCountData)
     }
     /* ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ */
+    this._setLoadingValue(false)
   }
 
   // 문서 검색 함수 ADAMs.api
@@ -174,22 +269,13 @@ class App extends Component {
   // { this._renderBody_topicTrend() }
   _renderBody = () => {
     return (
-    <div className="App_body">
-      <div className="body">
-        <div className="body_trend">
-          { this.state.topicTrendData ? this._renderBody_topicTrend() : "not data"}
-        </div>
-        <div className="body_context">
-          { this._rederBodyController(this.state.target)}  
-        </div>
+    <div className="body">
+      <div className="body_trend">
+        { this.state.topicTrendData ? this._renderBody_topicTrend() : "not data"}
       </div>
-        <div id="chart">
-          <TrendGraph 
-            values = {this.state.topicCountData}
-            testt = {this.state.testt}
-          />
-          <div id="graphTest"></div>
-        </div>
+      <div className="body_context">
+        { this._rederBodyController(this.state.target)}  
+      </div>
     </div>
     )
   }
@@ -248,7 +334,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <div className="App_nav">
+        <div className="navigation">
           { <Navigation 
             target_Type   = { this.state.target_Type  }
             keyword_Type  = { this.state.keyword_Type }
@@ -256,8 +342,20 @@ class App extends Component {
             reSearch_event = { this._setChangeOption }
           /> }
         </div>
+        { this.state.loading ?
+        <div className="App_body_loading"> 
+          <CircularProgress size={100} /> 
+        </div> 
+        :  
+        <div className="App_body">
           { this.state.search_Data ? this._renderBody() : "loading" }
-          
+ 
+          <TrendGraph 
+            scaleX = {this.state.TrendGraphDate}
+            scaleY = {this.state.TrendGraphCount}
+          />
+        </div>
+        }
       </div>
     )
   }

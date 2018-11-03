@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Chip from '@material-ui/core/Chip';
+import './topicTrendRank.css'
 
 class topicTrendRank extends Component {
 

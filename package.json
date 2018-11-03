@@ -5,8 +5,10 @@
   "dependencies": {
     "@material-ui/core": "^3.3.2",
     "@nivo/line": "^0.50.0",
+    "chart.js": "^2.7.3",
     "material-ui": "^0.20.2",
     "react": "^16.6.0",
+    "react-chartjs-2": "^2.7.4",
     "react-dom": "^16.6.0",
     "react-responsive-modal": "^3.5.0",
     "react-scripts": "2.1.0",
@@ -30,5 +32,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "gh-pages": "^2.0.1"
+  }
 }

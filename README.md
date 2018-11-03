@@ -8,4 +8,8 @@ BigData Api & ReactJS project
 - ReactJS
 - [Mareial-UI](https://www.npmjs.com/package/@material-ui/core)
 - [responsive-Modal](https://github.com/pradel/react-responsive-modal)
-- [~ing](#)
+- [react-chartjs-2](https://github.com/jerairrest/react-chartjs-2)
+- [~ing : Expected to be optimized Nov. 8 (Source code, function, etc.)](#)
+
+## Multiple keyword search
+## Graph view of trend data(Number of searches)

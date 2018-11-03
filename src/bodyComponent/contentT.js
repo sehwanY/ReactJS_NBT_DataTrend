@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import Modal from 'react-responsive-modal';
+import Button from '@material-ui/core/Button';
+import './content.css';
 
 
 class contentT extends Component {
@@ -18,8 +20,11 @@ class contentT extends Component {
     render() {
         const { open } = this.state;
         return (
-            <div>
-                <div onClick={this.onOpenModal}> {this.props.published_date} {this.props.message} </div>
+            <div className="contentArea">
+                <Button onClick={this.onOpenModal} variant="contained" color="primary" className="contButton">
+                    ( {this.props.published_date} {this.props.message} )
+                </Button>
+
                 <Modal open={open} onClose={this.onCloseModal} center>
                     <h2> {this.props.author} ( {this.props.tweet_id} ) </h2>
                     <div dangerouslySetInnerHTML={ {__html: this.props.published_date} }> 
