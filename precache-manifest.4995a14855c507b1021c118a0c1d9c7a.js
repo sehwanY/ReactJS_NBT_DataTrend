@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "d979ac7d4daf7f034681",
+    "revision": "d38c9df08bac6c2b499a",
     "url": "/ReactJS_NBT_DataTrend/static/css/main.f581d560.chunk.css"
   },
   {
-    "revision": "d979ac7d4daf7f034681",
-    "url": "/ReactJS_NBT_DataTrend/static/js/main.d979ac7d.chunk.js"
+    "revision": "d38c9df08bac6c2b499a",
+    "url": "/ReactJS_NBT_DataTrend/static/js/main.d38c9df0.chunk.js"
   },
   {
     "revision": "af55bcbff5cbd58414ef",
@@ -16,7 +16,7 @@ self.__precacheManifest = [
     "url": "/ReactJS_NBT_DataTrend/static/js/runtime~main.cd7b4788.js"
   },
   {
-    "revision": "aec50b3c9cc549a7d596a13093d1d7dd",
+    "revision": "298da080025cc2b23dc315ecac2cb1b4",
     "url": "/ReactJS_NBT_DataTrend/index.html"
   }
 ];
