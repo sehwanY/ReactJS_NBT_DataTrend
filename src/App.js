@@ -32,10 +32,10 @@ class App extends Component {
     period : null,
     criteria : "title",
 
-    search_value : "삼성",
+    search_value : "",
     search_value_second : "",
 
-    search_count : "30",
+    search_count : "100",
 
     loading : false
   }
@@ -78,50 +78,55 @@ class App extends Component {
         rewriteDatas.push(datas[addr])
       }
     }
-
-    let argContent = null
-    // 형광팬 처리
-    for(let addr in rewriteDatas){
-
-      let ContentData = new Array()
-      // 나중에 따로 함수화
-      // 내용 (첫번째 키워드)
-      if(rewriteDatas[addr].fields.content[0].indexOf(this.state.search_value)){
-        // 키워드를 기준으로 분리
-        ContentData = rewriteDatas[addr].fields.content[0].split(this.state.search_value)
-        // 재조합
-        for(let contentAddr=0; contentAddr < ContentData.length; contentAddr++){
-          if(contentAddr >= ContentData.length -1){
-            // 마지막엔 그냥 붙이기
-            argContent += ContentData[contentAddr]
-          }else{
-            argContent += ContentData[contentAddr] + "<span style='background-color:yellow'>" + this.state.search_value + "</span>"
-          }
-        }
-        rewriteDatas[addr].fields.content[0] = argContent
-        console.log(argContent)
-      }
-
-      // 두번째 키워드
-      if(rewriteDatas[addr].fields.content[0].indexOf(this.state.search_value_second)){
-        // 키워드를 기준으로 분리
-        ContentData = rewriteDatas[addr].fields.content[0].split(this.state.search_value_second)
-        // 재조합
-        for(let contentAddr=0; contentAddr < ContentData.length; contentAddr++){
-          if(contentAddr >= ContentData.length -1){
-            // 마지막엔 그냥 붙이기
-            argContent += ContentData[contentAddr]
-          }else{
-            argContent += ContentData[contentAddr] + "<span style='background-color:#00FEFE'>" + this.state.search_value_second + "</span>"
-          }
-        }
-        rewriteDatas[addr].fields.content[0] = argContent
-        console.log(argContent)
-      }
-    }
-
     //console.log(rewriteDatas)
     return rewriteDatas;
+  }
+
+  // 형광펜 칠하는 함수
+  _keywordMarker = (datas) => {
+    let argContent = null
+
+    let multiple = 0
+    if(this.state.keyword === "multiple"){
+      multiple = 1
+    }
+
+    // 형광팬 색
+    let color = "yellow"
+    let argColor = "#00FEFE"
+    let search_keyword = this.state.search_value
+
+    // 형광팬 처리
+    for(let double = 0; double < 1 + multiple; double++){
+      if(double === 1){
+        color = argColor
+        search_keyword = this.state.search_value_second
+      }
+
+      for(let addr in datas){
+
+        let ContentData = new Array()
+        // 나중에 따로 함수화
+        // 내용 (첫번째 키워드)
+        if(datas[addr].fields.content[0].indexOf(search_keyword)){
+          // 키워드를 기준으로 분리
+          ContentData = datas[addr].fields.content[0].split(search_keyword)
+          // 재조합
+          for(let contentAddr=0; contentAddr < ContentData.length; contentAddr++){
+            if(contentAddr >= ContentData.length -1){
+              // 마지막엔 그냥 붙이기
+              argContent += ContentData[contentAddr]
+            }else{
+              argContent += ContentData[contentAddr] + "<span style='background-color:"+ color +"'>" + search_keyword + "</span>"
+            }
+          }
+          datas[addr].fields.content[0] = argContent
+          console.log(argContent)
+          }
+        }
+      }
+      
+      return datas
   }
 
   // 검색 시작 (검색함수 호출 및 저장)
@@ -143,6 +148,9 @@ class App extends Component {
 
       console.log(search_Data)
     }
+
+    // 형광펜 색칠
+    search_Data = await this._keywordMarker(search_Data)
 
     switch(this.state.target){
       case 'news' :
