@@ -4,7 +4,7 @@ import Navigation from './navComponent/navigation'
 import ContentNB from './bodyComponent/contentNB'
 import ContentT from './bodyComponent/contentT'
 import TopicTrendRank from './bodyComponent/topicTrendRank'
-import TrendGraph from './bodyComponent/trendGraph'
+import TrendGraph from './footerComponent/trendGraph'
 import CircularProgress from '@material-ui/core/CircularProgress'
 
 class App extends Component {
@@ -32,7 +32,7 @@ class App extends Component {
     period : null,
     criteria : "title",
 
-    search_value : "",
+    search_value : "SK",
     search_value_second : "",
 
     search_count : "100",
@@ -107,7 +107,8 @@ class App extends Component {
 
         let ContentData = new Array()
         // 나중에 따로 함수화
-        // 내용 (첫번째 키워드)
+        // 내용 
+        // ★ 맨 앞&맨 뒤에 해당 키워드가 있을 경우 예외처리 추가할 것.
         if(datas[addr].fields.content[0].indexOf(search_keyword)){
           // 키워드를 기준으로 분리
           ContentData = datas[addr].fields.content[0].split(search_keyword)
@@ -339,6 +340,9 @@ class App extends Component {
   }
 
 
+  
+
+  // 랜더
   render() {
     return (
       <div className="App">
